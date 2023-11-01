@@ -1,5 +1,6 @@
 import React from 'react';
 import Modal from 'react-modal';
+Modal.setAppElement(document.getElementById('root'));
 
 const customStyles = {
   content: {
@@ -22,12 +23,7 @@ const customStyles = {
 
 export const ShowModal = ({ img, isOpen, onRequestClose }) => {
   return (
-    <Modal
-      isOpen={isOpen}
-      onRequestClose={onRequestClose}
-      style={customStyles}
-      contentLabel="Example Modal"
-    >
+    <Modal isOpen={isOpen} onRequestClose={onRequestClose} style={customStyles}>
       <img src={img.largeImageURL} alt={img.tags} />
     </Modal>
   );

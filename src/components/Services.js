@@ -8,5 +8,5 @@ export const getImages = async ({ searchQuery, page }) => {
     `?q=${searchQuery}&page=${page}&key=${KEY_API}&image_type=photo&orientation=horizontal&per_page=12`
   );
 
-  return response.data.hits;
+  return response.data;
 };

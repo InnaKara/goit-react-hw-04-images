@@ -15,6 +15,7 @@ export class App extends Component {
     page: 1,
     loading: false,
     error: false,
+    showBtn: false,
   };
 
   async componentDidUpdate(_, prevState) {
@@ -26,8 +27,8 @@ export class App extends Component {
       try {
         const image = await getImages(this.state);
         this.setState(prevState => ({
-          images: [...prevState.images, ...image],
-          loading: false,
+          images: [...prevState.images, ...image.hits],
+          showBtn: this.state.page < Math.ceil(image.totalHits / 12),
         }));
       } catch (error) {
         this.setState({ error: true });
@@ -37,11 +38,8 @@ export class App extends Component {
     }
   }
 
-  handleSubmit = event => {
-    event.preventDefault();
-    this.setState({ images: [] });
-    const searchQuery = event.target.search.value;
-    this.setState({ searchQuery, page: 1 });
+  handleSubmit = searchQuery => {
+    this.setState({ searchQuery, page: 1, images: [] });
   };
 
   handleLoadMore = () => {
@@ -49,7 +47,7 @@ export class App extends Component {
   };
 
   render() {
-    const { loading, images, error } = this.state;
+    const { loading, images, error, showBtn } = this.state;
 
     return (
       <Container>
@@ -57,7 +55,7 @@ export class App extends Component {
         <Searchbar onSubmit={this.handleSubmit}></Searchbar>
         {error && toast.error('Whoops! Error! Please reload this page!!!')}
         {images.length > 0 && <ImageGallery elements={images} />}
-        {images.length > 0 && <Button onClick={this.handleLoadMore} />}
+        {showBtn && <Button onClick={this.handleLoadMore} />}
         {loading && <Loader />}
       </Container>
     );

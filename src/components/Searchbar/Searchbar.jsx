@@ -8,9 +8,15 @@ import {
 import { FcSearch } from 'react-icons/fc';
 
 export const Searchbar = ({ onSubmit }) => {
+  const handleSearchSubmit = event => {
+    event.preventDefault();
+    const searchQuery = event.target.search.value;
+    onSubmit(searchQuery);
+  };
+
   return (
     <SearchbarWrap>
-      <SearchForm onSubmit={onSubmit}>
+      <SearchForm onSubmit={handleSearchSubmit}>
         <SearchButton type="submit">
           <FcSearch size={32}></FcSearch>
           <BtnLabel>Search</BtnLabel>
