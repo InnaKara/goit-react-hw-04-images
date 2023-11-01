@@ -55,7 +55,7 @@ export class App extends Component {
       <Container>
         <Toaster position="bottom-left" />
         <Searchbar onSubmit={this.handleSubmit}></Searchbar>
-        {error && toast.error('Whoops! Error! Please reload this page!')}
+        {error && toast.error('Whoops! Error! Please reload this page!!!')}
         {images.length > 0 && <ImageGallery elements={images} />}
         {images.length > 0 && <Button onClick={this.handleLoadMore} />}
         {loading && <Loader />}
