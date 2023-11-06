@@ -20,16 +20,15 @@ export const App = () => {
       return;
     }
     const fetchData = async () => {
-      let image;
       try {
         setLoading(true);
-        image = await getImages(searchQuery, page);
+        const image = await getImages(searchQuery, page);
         setImages(prevState => [...prevState, ...image.hits]);
+        setShowBtn(page < Math.ceil(image.totalHits / 12));
       } catch (error) {
         setError(true);
       } finally {
         setLoading(false);
-        setShowBtn(page < Math.ceil(image.totalHits / 12));
       }
     };
     fetchData();
