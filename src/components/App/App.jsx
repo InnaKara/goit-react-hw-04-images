@@ -1,5 +1,4 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button } from '../Button/Button';
 import { ImageGallery } from '../ImageGallery/ImageGallery';
 import { Loader } from '../Loader/Loader';
@@ -8,56 +7,53 @@ import { getImages } from '../Services';
 import { Container } from './App.styled';
 import toast, { Toaster } from 'react-hot-toast';
 
-export class App extends Component {
-  state = {
-    images: [],
-    searchQuery: '',
-    page: 1,
-    loading: false,
-    error: false,
-    showBtn: false,
-  };
+export const App = () => {
+  const [images, setImages] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(false);
+  const [showBtn, setShowBtn] = useState(false);
 
-  async componentDidUpdate(_, prevState) {
-    if (
-      prevState.searchQuery !== this.state.searchQuery ||
-      prevState.page !== this.state.page
-    ) {
-      this.setState({ loading: true });
-      try {
-        const image = await getImages(this.state);
-        this.setState(prevState => ({
-          images: [...prevState.images, ...image.hits],
-          showBtn: this.state.page < Math.ceil(image.totalHits / 12),
-        }));
-      } catch (error) {
-        this.setState({ error: true });
-      } finally {
-        this.setState({ loading: false });
-      }
+  useEffect(() => {
+    if (searchQuery === '') {
+      return;
     }
-  }
+    const fetchData = async () => {
+      let image;
+      try {
+        setLoading(true);
+        image = await getImages(searchQuery, page);
+        setImages(prevState => [...prevState, ...image.hits]);
+      } catch (error) {
+        setError(true);
+      } finally {
+        setLoading(false);
+        setShowBtn(page < Math.ceil(image.totalHits / 12));
+      }
+    };
+    fetchData();
+  }, [searchQuery, page]);
 
-  handleSubmit = searchQuery => {
-    this.setState({ searchQuery, page: 1, images: [] });
+  const handleSubmit = searchQuery => {
+    setSearchQuery(searchQuery);
+    setPage(1);
+    setImages([]);
   };
 
-  handleLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const handleLoadMore = () => {
+    setPage(prevState => prevState + 1);
   };
 
-  render() {
-    const { loading, images, error, showBtn } = this.state;
+  return (
+    <Container>
+      <Toaster position="bottom-left" />
 
-    return (
-      <Container>
-        <Toaster position="bottom-left" />
-        <Searchbar onSubmit={this.handleSubmit}></Searchbar>
-        {error && toast.error('Whoops! Error! Please reload this page!!!')}
-        {images.length > 0 && <ImageGallery elements={images} />}
-        {showBtn && <Button onClick={this.handleLoadMore} />}
-        {loading && <Loader />}
-      </Container>
-    );
-  }
-}
+      <Searchbar onSubmit={handleSubmit}></Searchbar>
+      {error && toast.error('Whoops! Error! Please reload this page!!!')}
+      {images.length > 0 && <ImageGallery elements={images} />}
+      {showBtn && <Button onClick={handleLoadMore} />}
+      {loading && <Loader />}
+    </Container>
+  );
+};
